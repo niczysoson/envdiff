@@ -95,3 +95,11 @@ def test_run_returns_two_for_missing_target(tmp_path):
 def test_run_no_color_flag_does_not_crash(source_env, target_env_full):
     result = run([str(source_env), str(target_env_full), "--no-color"])
     assert result == 0
+
+
+def test_run_returns_two_for_both_missing(tmp_path):
+    """Both source and target missing should still return exit code 2."""
+    missing_src = tmp_path / "nonexistent_src.env"
+    missing_tgt = tmp_path / "nonexistent_tgt.env"
+    result = run([str(missing_src), str(missing_tgt)])
+    assert result == 2
