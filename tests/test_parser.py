@@ -92,3 +92,13 @@ def test_parse_empty_value(env_file):
     path = env_file("EMPTY_VAR=\n")
     result = parse_env_file(path)
     assert result["EMPTY_VAR"] == ""
+
+
+def test_parse_export_prefix_stripped(env_file):
+    """Lines starting with 'export ' should have the prefix stripped."""
+    path = env_file("""
+        export APP_ENV=staging
+        export SECRET_KEY="abc123"
+    """)
+    result = parse_env_file(path)
+    assert result == {"APP_ENV": "staging", "SECRET_KEY": "abc123"}
