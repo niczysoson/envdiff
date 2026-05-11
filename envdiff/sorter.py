@@ -79,3 +79,16 @@ def render_sorted(
             lines.append(f"{key}={value}")
 
     return "\n".join(lines)
+
+
+def flatten(result: SortResult) -> List[Tuple[str, str]]:
+    """Return all items from a SortResult as a single sorted list.
+
+    Grouped items appear first (in prefix order, then key order within each
+    group), followed by ungrouped items in alphabetical order.
+    """
+    items: List[Tuple[str, str]] = []
+    for prefix_items in result.grouped.values():
+        items.extend(prefix_items)
+    items.extend(result.ungrouped)
+    return items
