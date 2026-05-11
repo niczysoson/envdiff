@@ -57,3 +57,26 @@ def render_template(result: TemplateResult) -> str:
         value = result.redacted.get(key, _PLACEHOLDER)
         lines.append(f"{key}={value}")
     return "\n".join(lines) + ("\n" if lines else "")
+
+
+def merge_templates(base: TemplateResult, override: TemplateResult) -> TemplateResult:
+    """Merge two TemplateResults, with override taking precedence.
+
+    Keys present in either result are included. Values and comments from
+    ``override`` take precedence over those in ``base`` when both define
+    the same key.
+
+    Args:
+        base: The base template result.
+        override: The template result whose values win on conflict.
+
+    Returns:
+        A new TemplateResult combining both inputs.
+    """
+    merged = TemplateResult()
+    all_keys = dict.fromkeys(base.keys)
+    all_keys.update(dict.fromkeys(override.keys))
+    merged.keys = sorted(all_keys)
+    merged.redacted = {**base.redacted, **override.redacted}
+    merged.comments = {**base.comments, **override.comments}
+    return merged
