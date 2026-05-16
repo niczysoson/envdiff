@@ -51,3 +51,18 @@ def test_integration_no_aliases_leaves_env_unchanged(env_file):
     result = apply_aliases(env, {})
     assert result.env == env
     assert not has_changes(result)
+
+
+def test_integration_multiple_aliases_applied(env_file):
+    """All aliases in a batch mapping should be applied in a single call."""
+    env = parse_env_file(str(env_file))
+    aliases = {
+        "DB_HOST": "DATABASE_HOST",
+        "DB_PORT": "DATABASE_PORT",
+        "DB_PASS": "DATABASE_PASSWORD",
+    }
+    result = apply_aliases(env, aliases)
+    for new_key in ("DATABASE_HOST", "DATABASE_PORT", "DATABASE_PASSWORD"):
+        assert new_key in result.env
+    assert has_changes(result)
+    assert not result.unknown
