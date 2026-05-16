@@ -36,6 +36,33 @@ def _is_suspicious(value: str) -> bool:
     return any(pat in lower for pat in _SUSPICIOUS_PATTERNS)
 
 
+def format_report(result: ScanResult) -> str:
+    """Return a human-readable summary of a ScanResult.
+
+    Example output::
+
+        File: .env
+        Duplicates: FOO (2x), BAR (3x)
+        Suspicious values: SECRET, TOKEN
+    """
+    lines: List[str] = []
+    header = f"File: {result.source_file}" if result.source_file else "File: <unknown>"
+    lines.append(header)
+
+    if result.duplicates:
+        dup_parts = ", ".join(f"{k} ({v}x)" for k, v in result.duplicates.items())
+        lines.append(f"Duplicates: {dup_parts}")
+    else:
+        lines.append("Duplicates: none")
+
+    if result.suspicious:
+        lines.append(f"Suspicious values: {', '.join(result.suspicious)}")
+    else:
+        lines.append("Suspicious values: none")
+
+    return "\n".join(lines)
+
+
 def scan_env_file(lines: List[str], source_file: str = "") -> ScanResult:
     """Scan raw lines from a .env file for duplicate keys and suspicious values."""
     key_counts: Dict[str, int] = {}
